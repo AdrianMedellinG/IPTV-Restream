@@ -1,20 +1,14 @@
 version: "3.9"
+
 services:
   iptv_restream_frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # Set this to the server ip/domain, if your backend is deployed on a different server
-        #VITE_BACKEND_URL: http://123.123.123.123:5000
+        VITE_BACKEND_URL: http://iptv_restream_backend:5000
         VITE_STREAM_DELAY: 18
         VITE_STREAM_PROXY_DELAY: 30
-        # Optional settings for synchronization
-        #VITE_SYNCHRONIZATION_TOLERANCE: 0.8
-        #VITE_SYNCHRONIZATION_MAX_DEVIATION: 4
-        #VITE_SYNCHRONIZATION_ADJUSTMENT: 0.06
-        #VITE_SYNCHRONIZATION_MAX_ADJUSTMENT: 0.16
-
     networks:
       - app-network
 
@@ -28,36 +22,27 @@ services:
       - channels:/channels
     environment:
       STORAGE_PATH: /streams/
-      # If you have problems with the playlist, set the backend url manually here
-      #BACKEND_URL: http://localhost:5000
-
-      # Admin mode configuration
+      #BACKEND_URL: http://iptv_restream_backend:5000
       # ADMIN_ENABLED: "true"
       # ADMIN_PASSWORD: "your_secure_password"
       # CHANNEL_SELECTION_REQUIRES_ADMIN: "true"
     networks:
       - app-network
 
-  # Nginx Reverse Proxy
   iptv_restream_nginx:
     image: nginx:alpine
     volumes:
-      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - streams_data:/streams
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     networks:
       - app-network
 
 volumes:
   streams_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
   channels:
 
-# Internal docker network
 networks:
   app-network:
     driver: bridge
