@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_BACKEND_URL: http://iptv_restream_backend:5000
+        VITE_BACKEND_URL: /api
         VITE_STREAM_DELAY: 18
         VITE_STREAM_PROXY_DELAY: 30
     networks:
